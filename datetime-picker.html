@@ -1,0 +1,570 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Custom Inline Date & Time Picker</title><style>body{font-family:Arial,sans-serif;display:flex;justify-content:center;align-items:flex-start;height:100vh;background-color:#f0f0f0;margin:0;padding-top:0}.container{background-color:#fff;padding:0 20px 20px;border-radius:10px;box-shadow:0 0 10px rgba(0,0,0,.1);text-align:center;max-width:400px;width:100%;position:relative}.container h2{margin-bottom:15px;font-size:1.4em;color:#333}.calendar-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;padding:0 5px}.calendar-header button{padding:6px 10px;cursor:pointer;border:none;background:#f8f9fa;border-radius:20px;color:#007bff;font-weight:500;font-size:.9em;transition:all .3s ease;box-shadow:0 2px 4px rgba(0,0,0,.1);white-space:nowrap}.calendar-header button:hover:not(:disabled){background:#007bff;color:#fff}.calendar-header button:disabled{background:#e9ecef;color:#adb5bd;cursor:not-allowed;box-shadow:none}#monthYear{font-weight:700;font-size:1.1em;color:#333;display:flex;flex-direction:column;line-height:1.2}.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-bottom:15px;padding:5px}.day-name{font-weight:700;color:#666;padding:5px;font-size:.9em}.day-cell{padding:8px;background-color:#f8f9fa;border-radius:5px;cursor:pointer;transition:all .2s ease}.day-cell:hover:not(.disabled){background-color:#e3f2fd;transform:scale(1.1)}.disabled{background-color:#e9ecef!important;color:#adb5bd!important;cursor:not-allowed!important;transform:none!important}.selected{background-color:#007bff!important;color:#fff!important;font-weight:700;transform:scale(1.1)}.time-picker{margin-bottom:20px;display:flex;justify-content:center;align-items:center;gap:30px}.time-picker label{color:#495057;font-weight:500;margin-bottom:5px}.spinner-container{display:flex;flex-direction:column;align-items:center;position:relative;height:120px;overflow:hidden;background:#f8f9fa;border-radius:10px;padding:0 15px;min-width:70px;cursor:grab;touch-action:pan-y}.spinner-container.dragging{cursor:grabbing}.spinner-container::after,.spinner-container::before{content:'';position:absolute;left:0;right:0;height:40px;z-index:1;pointer-events:none}.spinner-container::before{top:0;background:linear-gradient(to bottom,rgba(248,249,250,1) 0,rgba(248,249,250,0) 100%)}.spinner-container::after{bottom:0;background:linear-gradient(to top,rgba(248,249,250,1) 0,rgba(248,249,250,0) 100%)}.spinner-values{display:flex;flex-direction:column;align-items:center;transform:translateY(40px);pointer-events:none}.spinner-value{height:40px;line-height:40px;font-size:1.2em;color:#adb5bd;transition:all .2s ease;user-select:none}.spinner-container .spinner-value.selected{color:#616060!important;font-size:1.4em;font-weight:700;background:0 0!important;transform:none!important}.spinner-value.disabled{color:#dee2e6;pointer-events:none}.time-unit{display:flex;flex-direction:column;align-items:center}.submit-btn{padding:12px 25px;border:none;border-radius:25px;background-color:#007bff;color:#fff;font-size:16px;font-weight:500;cursor:pointer;transition:all .3s ease;box-shadow:0 2px 4px rgba(0,0,0,.1)}.submit-btn:hover{background-color:#0056b3;transform:translateY(-1px);box-shadow:0 4px 6px rgba(0,0,0,.1)}.submit-btn:active{transform:translateY(0);box-shadow:0 2px 4px rgba(0,0,0,.1)}.error-popup{background-color:#f8d7da;color:#721c24;padding:12px;border-radius:8px;border:1px solid #f5c6cb;display:none;margin-top:20px;width:calc(100% - 24px);position:absolute;bottom:-70px;left:50%;transform:translateX(-50%);box-shadow:0 2px 4px rgba(0,0,0,.1);font-size:.9em}.onboarding-animation{position:absolute;left:50%;transform:translateX(-50%);top:20px;width:40px;height:40px;z-index:10;animation:scrollAnimation 2s ease-in-out forwards;opacity:0;pointer-events:none}@keyframes scrollAnimation{0%{opacity:0;transform:translate(-50%,0)}20%{opacity:1;transform:translate(-50%,0)}40%{transform:translate(-50%,40px)}60%{transform:translate(-50%,0)}80%{opacity:1;transform:translate(-50%,40px)}100%{opacity:0;transform:translate(-50%,40px)}}</style></head><body><div class="container"><h2>Оберіть дату та час</h2><div class="calendar-header"><button id="prevBtn">← Попередній</button><div id="monthYear"></div><button id="nextBtn">Наступний →</button></div><div class="calendar-grid" id="calendarGrid"></div><div class="time-picker"><div class="time-unit"><label>Години</label><div class="spinner-container" id="hourSpinner"><svg class="onboarding-animation" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path style="fill:#FDC794;" d="M459.09,220.69c0-19.421-15.89-35.31-35.31-35.31c-19.421,0-35.31,15.89-35.31,35.31v-44.138 c0-19.421-15.89-35.31-35.31-35.31c-19.421,0-35.31,15.89-35.31,35.31v-35.31c0-19.421-15.89-35.31-35.31-35.31l0,0 c-19.421,0-35.31,15.89-35.31,35.31v35.31V35.31c0-19.421-15.89-35.31-35.31-35.31l0,0c-19.421,0-35.31,15.89-35.31,35.31v229.517 l-15.89-23.834c-17.655-30.897-60.028-45.021-88.276-34.428c-4.414,0.883-7.062,3.531-10.593,5.297 c-10.593,7.062-8.828,15.007-8.828,17.655s50.317,53.848,79.448,105.931c0,0,25.6,42.372,52.966,70.621v26.483 c0,44.138,35.31,79.448,79.448,79.448h88.276c34.428,0,69.738-29.131,77.683-62.676c1.766-7.945,5.297-19.421,10.593-25.6 c7.945-8.828,17.655-30.897,17.655-61.793V220.69z"/></svg><div class="spinner-values"></div></div></div><div class="time-unit"><label>Хвилини</label><div class="spinner-container" id="minuteSpinner"><div class="spinner-values"></div></div></div></div><input type="hidden" id="datetime" name="datetime"><button class="submit-btn" onclick="submitDateTime()">Підтвердити</button><div id="error-popup" class="error-popup"></div></div><script src="https://telegram.org/js/telegram-web-app.js"></script><script>// -----------------------------
+        //       GLOBAL VARIABLES
+        // -----------------------------
+        const now = new Date();
+        let currentYear, currentMonth; // For building the calendar
+        let selectedYear, selectedMonth, selectedDay; // Track chosen day
+        let selectedHour, selectedMinute; // Track chosen time
+        
+        // Initialize with rounded up time
+        function initializeDateTime() {
+            const currentMinute = now.getMinutes();
+            const currentHour = now.getHours();
+            
+            // Calculate next valid minute (round up to next 5-minute interval)
+            let nextMinute = Math.ceil((currentMinute + 15) / 5) * 5;
+            let nextHour = currentHour;
+            let nextDay = now.getDate();
+            let nextMonth = now.getMonth();
+            let nextYear = now.getFullYear();
+
+            // Handle minute overflow
+            if (nextMinute >= 60) {
+                nextMinute = 0;
+                nextHour++;
+            }
+
+            // Handle hour overflow
+            if (nextHour >= 24) {
+                nextHour = 0;
+                nextDay++;
+            }
+
+            // Handle day overflow
+            const lastDayOfMonth = new Date(nextYear, nextMonth + 1, 0).getDate();
+            if (nextDay > lastDayOfMonth) {
+                nextDay = 1;
+                nextMonth++;
+            }
+
+            // Handle month overflow
+            if (nextMonth >= 12) {
+                nextMonth = 0;
+                nextYear++;
+            }
+
+            // Set the global variables
+            selectedYear = nextYear;
+            selectedMonth = nextMonth;
+            selectedDay = nextDay;
+            selectedHour = nextHour;
+            selectedMinute = nextMinute;
+
+            return {
+                year: nextYear,
+                month: nextMonth,
+                day: nextDay,
+                hour: nextHour,
+                minute: nextMinute
+            };
+        }
+
+        // Initialize time with rounded values
+        const initialTime = initializeDateTime();
+
+        // -----------------------------
+        //      DOCUMENT READY
+        // -----------------------------
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize current month/year from rounded time
+            currentYear = initialTime.year;
+            currentMonth = initialTime.month;
+
+            // Initialize with rounded date
+            selectedYear = initialTime.year;
+            selectedMonth = initialTime.month;
+            selectedDay = initialTime.day;
+
+            // Fill hour/minute spinners
+            const isCurrentDay = selectedYear === now.getFullYear() && 
+                               selectedMonth === now.getMonth() && 
+                               selectedDay === now.getDate();
+            const isCurrentHour = isCurrentDay && selectedHour === now.getHours();
+
+            // Initialize hour spinner
+            setupSpinner('hourSpinner', generateHourValues(), (value) => {
+                const newHour = parseInt(value, 10);
+                const oldHour = selectedHour;
+                selectedHour = newHour;
+
+                // When hour changes, regenerate minutes
+                const isCurrentDay = selectedYear === now.getFullYear() && 
+                                   selectedMonth === now.getMonth() && 
+                                   selectedDay === now.getDate();
+                
+                // Reset minute spinner if moving to a future hour
+                if (!isCurrentDay || newHour > initialTime.hour) {
+                    setupSpinner('minuteSpinner', generateMinuteValues(), (value) => {
+                        selectedMinute = parseInt(value, 10);
+                        updateDateTime();
+                    });
+                } else {
+                    // Only apply restrictions if it's today and current hour
+                    adjustTimeIfToday();
+                }
+                
+                updateDateTime();
+            });
+
+            // Initialize minute spinner
+            setupSpinner('minuteSpinner', generateMinuteValues(), (value) => {
+                selectedMinute = parseInt(value, 10);
+                updateDateTime();
+            });
+
+            // Generate the initial calendar
+            generateCalendar(currentYear, currentMonth);
+
+            // Set up next/prev buttons
+            document.getElementById('prevBtn').addEventListener('click', function() {
+                changeMonth(-1);
+            });
+            document.getElementById('nextBtn').addEventListener('click', function() {
+                changeMonth(1);
+            });
+
+            // Initial check for prev button state
+            updateNavigationButtons();
+
+            // Initial time adjustment for today
+            adjustTimeIfToday();
+            updateDateTime();
+        });
+
+        // -----------------------------
+        //     TIME SELECT DROPDOWNS
+        // -----------------------------
+        function generateHourValues() {
+            const hours = [];
+            for (let h = 0; h < 24; h++) {
+                hours.push({
+                    value: h,
+                    text: (''+h).padStart(2,'0'),
+                    disabled: false
+                });
+            }
+            return hours;
+        }
+
+        function generateMinuteValues() {
+            const minutes = [];
+            // Only use 5-minute intervals
+            for (let m = 0; m < 60; m += 5) {
+                minutes.push({
+                    value: m,
+                    text: (''+m).padStart(2,'0'),
+                    disabled: false
+                });
+            }
+            return minutes;
+        }
+
+        function setupSpinner(containerId, values, onSelect) {
+            const container = document.getElementById(containerId);
+            const valuesContainer = container.querySelector('.spinner-values');
+            let startY = 0;
+            let currentTranslateY = 40;
+            let isDragging = false;
+
+            // Clear existing values
+            valuesContainer.innerHTML = '';
+
+            // Populate values
+            values.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'spinner-value' + (item.disabled ? ' disabled' : '');
+                div.textContent = item.text;
+                div.dataset.value = item.value;
+                valuesContainer.appendChild(div);
+            });
+
+            // Touch/Mouse events
+            container.addEventListener('mousedown', (e) => {
+                e.stopPropagation(); // Prevent event from bubbling to document
+                startDragging(e);
+            });
+            
+            container.addEventListener('touchstart', (e) => {
+                e.stopPropagation(); // Prevent event from bubbling to document
+                if (e.cancelable) {
+                    e.preventDefault(); // Prevent scrolling only within spinner
+                }
+                startDragging(e.touches[0]);
+            }, { passive: false });
+
+            // Handle move events on document to allow dropping outside
+            document.addEventListener('mousemove', (e) => {
+                if (isDragging) drag(e);
+            });
+            
+            document.addEventListener('touchmove', (e) => {
+                if (isDragging) {
+                    if (e.cancelable) {
+                        e.preventDefault(); // Prevent scrolling only when dragging
+                    }
+                    drag(e.touches[0]);
+                }
+            }, { passive: false });
+
+            document.addEventListener('mouseup', stopDragging);
+            document.addEventListener('touchend', stopDragging);
+
+            // Prevent default touch behavior only within spinner
+            container.addEventListener('touchmove', (e) => {
+                if (e.cancelable) {
+                    e.preventDefault();
+                }
+            }, { passive: false });
+
+            function startDragging(e) {
+                isDragging = true;
+                startY = e.pageY - currentTranslateY;
+                container.classList.add('dragging');
+            }
+
+            function drag(e) {
+                if (!isDragging) return;
+                
+                const y = e.pageY - startY;
+                const values = valuesContainer.children;
+                const itemHeight = 40;
+                const maxTranslate = 40;
+                const minTranslate = -((values.length - 1) * itemHeight - 40);
+
+                currentTranslateY = Math.max(minTranslate, Math.min(maxTranslate, y));
+                valuesContainer.style.transform = `translateY(${currentTranslateY}px)`;
+
+                // Update selected value
+                const selectedIndex = Math.round(Math.abs(currentTranslateY - 40) / itemHeight);
+                updateSelection(selectedIndex);
+            }
+
+            function stopDragging() {
+                if (!isDragging) return;
+                isDragging = false;
+                container.classList.remove('dragging');
+
+                // Snap to closest value
+                const itemHeight = 40;
+                currentTranslateY = Math.round((currentTranslateY - 40) / itemHeight) * itemHeight + 40;
+                valuesContainer.style.transform = `translateY(${currentTranslateY}px)`;
+
+                const selectedIndex = Math.round(Math.abs(currentTranslateY - 40) / itemHeight);
+                updateSelection(selectedIndex);
+            }
+
+            function updateSelection(selectedIndex) {
+                const values = valuesContainer.children;
+                [...values].forEach(v => v.classList.remove('selected'));
+                
+                if (values[selectedIndex]) {
+                    const value = values[selectedIndex];
+                    if (!value.classList.contains('disabled')) {
+                        value.classList.add('selected');
+                        onSelect(value.dataset.value);
+                    } else {
+                        // If selected value is disabled, find next available value
+                        const nextAvailable = [...values].find((v, i) => i >= selectedIndex && !v.classList.contains('disabled'));
+                        if (nextAvailable) {
+                            nextAvailable.classList.add('selected');
+                            const newIndex = Array.from(values).indexOf(nextAvailable);
+                            currentTranslateY = 40 - (newIndex * 40);
+                            valuesContainer.style.transform = `translateY(${currentTranslateY}px)`;
+                            onSelect(nextAvailable.dataset.value);
+                        }
+                    }
+                }
+            }
+
+            // Initialize with current value
+            const initialValue = containerId === 'hourSpinner' ? selectedHour : selectedMinute;
+            const initialIndex = values.findIndex(v => v.value === initialValue);
+            if (initialIndex !== -1) {
+                currentTranslateY = 40 - (initialIndex * 40);
+                valuesContainer.style.transform = `translateY(${currentTranslateY}px)`;
+                updateSelection(initialIndex);
+            } else {
+                // If initial value not found, select first non-disabled value
+                const firstValidIndex = values.findIndex(v => !v.disabled);
+                if (firstValidIndex !== -1) {
+                    currentTranslateY = 40 - (firstValidIndex * 40);
+                    valuesContainer.style.transform = `translateY(${currentTranslateY}px)`;
+                    updateSelection(firstValidIndex);
+                }
+            }
+        }
+
+        // -----------------------------
+        //     NAVIGATION CONTROLS
+        // -----------------------------
+        function updateNavigationButtons() {
+            const prevBtn = document.getElementById('prevBtn');
+            
+            // Check if going to previous month would go to the past
+            const prevMonth = new Date(currentYear, currentMonth - 1, 1);
+            const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+            
+            // Disable previous button if it would go to past month
+            prevBtn.disabled = prevMonth < currentMonthStart;
+        }
+
+        // Move to next/previous month
+        function changeMonth(delta) {
+            currentMonth += delta;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear -= 1;
+            }
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear += 1;
+            }
+            generateCalendar(currentYear, currentMonth);
+            updateNavigationButtons();
+        }
+
+        // -----------------------------
+        //        CALENDAR LOGIC
+        // -----------------------------
+        function generateCalendar(year, month) {
+            // Set the month/year label
+            const monthYearLabel = document.getElementById('monthYear');
+            const monthNames = ['Січень','Лютий','Березень','Квітень','Травень','Червень',
+                                'Липень','Серпень','Вересень','Жовтень','Листопад','Грудень'];
+            monthYearLabel.innerHTML = `${monthNames[month]}<br>${year}`;
+
+            // Build day names row + day cells
+            const calendarGrid = document.getElementById('calendarGrid');
+            calendarGrid.innerHTML = ''; // Clear old days
+
+            // Day names (Mon-Sun)
+            const dayNames = ['Пн','Вт','Ср','Чт','Пт','Сб','Нд'];
+            // Render day name cells
+            dayNames.forEach(dn => {
+                const cell = document.createElement('div');
+                cell.classList.add('day-name');
+                cell.textContent = dn;
+                calendarGrid.appendChild(cell);
+            });
+
+            // First day of this month
+            const firstOfMonth = new Date(year, month, 1);
+            // Last day of this month
+            const lastOfMonth = new Date(year, month+1, 0);
+            const totalDays = lastOfMonth.getDate();
+
+            // Determining the day of week (0=Sun,1=Mon,...) and adjusting to make Monday=0
+            let startDay = firstOfMonth.getDay();
+            // Convert from Sunday-based (0-6) to Monday-based (0-6)
+            startDay = startDay === 0 ? 6 : startDay - 1;
+
+            // Render empty cells for days before the first of month
+            for (let i = 0; i < startDay; i++) {
+                const emptyCell = document.createElement('div');
+                emptyCell.classList.add('day-cell', 'disabled');
+                calendarGrid.appendChild(emptyCell);
+            }
+
+            // Render each day of this month
+            for (let day = 1; day <= totalDays; day++) {
+                const dayCell = document.createElement('div');
+                dayCell.classList.add('day-cell');
+                dayCell.textContent = day;
+
+                // Check if this day is in the past
+                if (isPastDate(year, month, day)) {
+                    dayCell.classList.add('disabled');
+                } else {
+                    // Not in the past => can select
+                    dayCell.addEventListener('click', () => selectDay(year, month, dayCell));
+                }
+
+                // If it's currently selected, highlight it
+                if (year === selectedYear && month === selectedMonth && day === selectedDay) {
+                    dayCell.classList.add('selected');
+                }
+
+                calendarGrid.appendChild(dayCell);
+            }
+        }
+
+        function selectDay(year, month, dayCell) {
+            // Clear previous selection
+            const calendarGrid = document.getElementById('calendarGrid');
+            [...calendarGrid.querySelectorAll('.day-cell')].forEach(cell =>
+                cell.classList.remove('selected')
+            );
+
+            // Mark the new day as selected
+            dayCell.classList.add('selected');
+
+            // Update global selected date
+            selectedYear = year;
+            selectedMonth = month;
+            selectedDay = parseInt(dayCell.textContent, 10);
+
+            // Possibly adjust time if it's the current day
+            adjustTimeIfToday();
+            updateDateTime();
+        }
+
+        function updateDateTime() {
+            // If any date or time is missing, set #datetime = ''
+            const input = document.getElementById('datetime');
+            if (
+                selectedYear == null ||
+                selectedMonth == null ||
+                selectedDay == null
+            ) {
+                input.value = '';
+                return;
+            }
+
+            // Format date & time => YYYY-MM-DD HH:mm
+            const y = selectedYear;
+            const m = (selectedMonth + 1).toString().padStart(2,'0');
+            const d = selectedDay.toString().padStart(2,'0');
+            const hh = selectedHour.toString().padStart(2,'0');
+            const mm = selectedMinute.toString().padStart(2,'0');
+
+            input.value = `${y}-${m}-${d} ${hh}:${mm}`;
+        }
+
+        // Checks if the given year-month-day is strictly before today's date
+        function isPastDate(year, month, day) {
+            const testDate = new Date(year, month, day);
+            // Compare date portion ignoring time
+            const nowMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            if (testDate < nowMidnight) {
+                return true;
+            }
+            return false;
+        }
+
+        function adjustTimeIfToday() {
+            const hourSpinner = document.getElementById('hourSpinner');
+            const minuteSpinner = document.getElementById('minuteSpinner');
+
+            // Reset disabled states
+            [...hourSpinner.querySelectorAll('.spinner-value')].forEach(v => {
+                v.classList.remove('disabled');
+            });
+            [...minuteSpinner.querySelectorAll('.spinner-value')].forEach(v => {
+                v.classList.remove('disabled');
+            });
+
+            const isToday = (
+                selectedYear === now.getFullYear() &&
+                selectedMonth === now.getMonth() &&
+                selectedDay === now.getDate()
+            );
+            
+            if (!isToday) return;
+
+            const roundedTime = initializeDateTime();
+            const minHour = roundedTime.hour;
+            const minMinute = roundedTime.minute;
+
+            // Disable past hours
+            [...hourSpinner.querySelectorAll('.spinner-value')].forEach(v => {
+                const hVal = parseInt(v.dataset.value, 10);
+                if (hVal < minHour) {
+                    v.classList.add('disabled');
+                }
+            });
+
+            // Handle minutes
+            if (selectedHour === minHour) {
+                // If it's the minimum hour, disable minutes before minMinute
+                [...minuteSpinner.querySelectorAll('.spinner-value')].forEach(v => {
+                    const mVal = parseInt(v.dataset.value, 10);
+                    if (mVal < minMinute) {
+                        v.classList.add('disabled');
+                    }
+                });
+            } else if (selectedHour < minHour) {
+                // If hour is before minimum hour, disable all minutes
+                [...minuteSpinner.querySelectorAll('.spinner-value')].forEach(v => {
+                    v.classList.add('disabled');
+                });
+            } else {
+                // For future hours, enable all minutes
+                [...minuteSpinner.querySelectorAll('.spinner-value')].forEach(v => {
+                    v.classList.remove('disabled');
+                });
+            }
+
+            // Adjust selection if needed
+            if (selectedHour < minHour) {
+                const validHourEl = [...hourSpinner.querySelectorAll('.spinner-value:not(.disabled)')][0];
+                if (validHourEl) {
+                    selectedHour = parseInt(validHourEl.dataset.value, 10);
+                    const index = Array.from(hourSpinner.querySelectorAll('.spinner-value')).indexOf(validHourEl);
+                    const translateY = 40 - (index * 40);
+                    hourSpinner.querySelector('.spinner-values').style.transform = `translateY(${translateY}px)`;
+                    validHourEl.classList.add('selected');
+                }
+            }
+
+            if (selectedHour === minHour && selectedMinute < minMinute) {
+                const validMinuteEl = [...minuteSpinner.querySelectorAll('.spinner-value:not(.disabled)')][0];
+                if (validMinuteEl) {
+                    selectedMinute = parseInt(validMinuteEl.dataset.value, 10);
+                    const index = Array.from(minuteSpinner.querySelectorAll('.spinner-value')).indexOf(validMinuteEl);
+                    const translateY = 40 - (index * 40);
+                    minuteSpinner.querySelector('.spinner-values').style.transform = `translateY(${translateY}px)`;
+                    validMinuteEl.classList.add('selected');
+                }
+            }
+
+            updateDateTime();
+        }
+
+        // Function to check if selected time is at least 15 minutes in the future
+        function isTimeValid() {
+            if (!selectedYear || !selectedMonth || !selectedDay) return false;
+
+            const selectedDate = new Date(selectedYear, selectedMonth, selectedDay, selectedHour, selectedMinute);
+            const minimumDate = new Date(now.getTime() + 15 * 60000); // now + 15 minutes
+
+            return selectedDate >= minimumDate;
+        }
+
+        // -----------------------------
+        //       TELEGRAM SUBMIT
+        // -----------------------------
+        function submitDateTime() {
+            const datetime = document.getElementById('datetime').value;
+            const errorPopup = document.getElementById('error-popup');
+
+            try {
+                if (!datetime) {
+                    throw new Error('Будь ласка, оберіть дату та час.');
+                }
+
+                if (!isTimeValid()) {
+                    throw new Error('Час має бути не менше ніж через 15 хвилин від поточного.');
+                }
+
+                    // Pass the selected date and time back to the Telegram bot
+                if (window.Telegram && window.Telegram.WebApp) {
+                        window.Telegram.WebApp.sendData(datetime); // Send data back to the bot
+                        setTimeout(() => {
+                        window.Telegram.WebApp.close(); // Close the web app
+                        }, 100); // Delay to ensure data is sent
+                } else {
+                    throw new Error('Telegram WebApp API не знайдено. Неможливо відправити дату та час.');
+                }
+            } catch (error) {
+                errorPopup.textContent = error.message;
+                errorPopup.style.display = 'block';
+                setTimeout(() => {
+                    errorPopup.style.display = 'none';
+                }, 5000); // Hide the popup after 5 seconds
+            }
+        }
+
+        // Notify Telegram the WebApp is ready (if present)
+        if (window.Telegram && window.Telegram.WebApp) {
+        Telegram.WebApp.ready();
+        }</script></body></html>
