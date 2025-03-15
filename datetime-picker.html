@@ -1,4 +1,88 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Custom Inline Date & Time Picker</title><style>body{font-family:Arial,sans-serif;display:flex;justify-content:center;align-items:flex-start;height:100vh;background-color:#f0f0f0;margin:0;padding-top:0}.container{background-color:#fff;padding:0 20px 20px;border-radius:10px;box-shadow:0 0 10px rgba(0,0,0,.1);text-align:center;max-width:400px;width:100%;position:relative}.container h2{margin-bottom:15px;font-size:1.4em;color:#333}.calendar-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;padding:0 5px}.calendar-header button{padding:6px 10px;cursor:pointer;border:none;background:#f8f9fa;border-radius:20px;color:#007bff;font-weight:500;font-size:.9em;transition:all .3s ease;box-shadow:0 2px 4px rgba(0,0,0,.1);white-space:nowrap}.calendar-header button:hover:not(:disabled){background:#007bff;color:#fff}.calendar-header button:disabled{background:#e9ecef;color:#adb5bd;cursor:not-allowed;box-shadow:none}#monthYear{font-weight:700;font-size:1.1em;color:#333;display:flex;flex-direction:column;line-height:1.2}.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-bottom:15px;padding:5px}.day-name{font-weight:700;color:#666;padding:5px;font-size:.9em}.day-cell{padding:8px;background-color:#f8f9fa;border-radius:5px;cursor:pointer;transition:all .2s ease}.day-cell:hover:not(.disabled){background-color:#e3f2fd;transform:scale(1.1)}.disabled{background-color:#e9ecef!important;color:#adb5bd!important;cursor:not-allowed!important;transform:none!important}.selected{background-color:#007bff!important;color:#fff!important;font-weight:700;transform:scale(1.1)}.time-picker{margin-bottom:20px;display:flex;justify-content:center;align-items:center;gap:30px}.time-picker label{color:#495057;font-weight:500;margin-bottom:5px}.spinner-container{display:flex;flex-direction:column;align-items:center;position:relative;height:120px;overflow:hidden;background:#f8f9fa;border-radius:10px;padding:0 15px;min-width:70px;cursor:grab;touch-action:pan-y}.spinner-container.dragging{cursor:grabbing}.spinner-container::after,.spinner-container::before{content:'';position:absolute;left:0;right:0;height:40px;z-index:1;pointer-events:none}.spinner-container::before{top:0;background:linear-gradient(to bottom,rgba(248,249,250,1) 0,rgba(248,249,250,0) 100%)}.spinner-container::after{bottom:0;background:linear-gradient(to top,rgba(248,249,250,1) 0,rgba(248,249,250,0) 100%)}.spinner-values{display:flex;flex-direction:column;align-items:center;transform:translateY(40px);pointer-events:none}.spinner-value{height:40px;line-height:40px;font-size:1.2em;color:#adb5bd;transition:all .2s ease;user-select:none}.spinner-container .spinner-value.selected{color:#616060!important;font-size:1.4em;font-weight:700;background:0 0!important;transform:none!important}.spinner-value.disabled{color:#dee2e6;pointer-events:none}.time-unit{display:flex;flex-direction:column;align-items:center}.submit-btn{padding:12px 25px;border:none;border-radius:25px;background-color:#007bff;color:#fff;font-size:16px;font-weight:500;cursor:pointer;transition:all .3s ease;box-shadow:0 2px 4px rgba(0,0,0,.1)}.submit-btn:hover{background-color:#0056b3;transform:translateY(-1px);box-shadow:0 4px 6px rgba(0,0,0,.1)}.submit-btn:active{transform:translateY(0);box-shadow:0 2px 4px rgba(0,0,0,.1)}.error-popup{background-color:#f8d7da;color:#721c24;padding:12px;border-radius:8px;border:1px solid #f5c6cb;display:none;margin-top:20px;width:calc(100% - 24px);position:absolute;bottom:-70px;left:50%;transform:translateX(-50%);box-shadow:0 2px 4px rgba(0,0,0,.1);font-size:.9em}.onboarding-animation{position:absolute;left:50%;transform:translateX(-50%);top:20px;width:40px;height:40px;z-index:10;animation:scrollAnimation 2s ease-in-out forwards;opacity:0;pointer-events:none}@keyframes scrollAnimation{0%{opacity:0;transform:translate(-50%,0)}20%{opacity:1;transform:translate(-50%,0)}40%{transform:translate(-50%,40px)}60%{transform:translate(-50%,0)}80%{opacity:1;transform:translate(-50%,40px)}100%{opacity:0;transform:translate(-50%,40px)}}</style></head><body><div class="container"><h2>Оберіть дату та час</h2><div class="calendar-header"><button id="prevBtn">← Попередній</button><div id="monthYear"></div><button id="nextBtn">Наступний →</button></div><div class="calendar-grid" id="calendarGrid"></div><div class="time-picker"><div class="time-unit"><label>Години</label><div class="spinner-container" id="hourSpinner"><svg class="onboarding-animation" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path style="fill:#FDC794;" d="M459.09,220.69c0-19.421-15.89-35.31-35.31-35.31c-19.421,0-35.31,15.89-35.31,35.31v-44.138 c0-19.421-15.89-35.31-35.31-35.31c-19.421,0-35.31,15.89-35.31,35.31v-35.31c0-19.421-15.89-35.31-35.31-35.31l0,0 c-19.421,0-35.31,15.89-35.31,35.31v35.31V35.31c0-19.421-15.89-35.31-35.31-35.31l0,0c-19.421,0-35.31,15.89-35.31,35.31v229.517 l-15.89-23.834c-17.655-30.897-60.028-45.021-88.276-34.428c-4.414,0.883-7.062,3.531-10.593,5.297 c-10.593,7.062-8.828,15.007-8.828,17.655s50.317,53.848,79.448,105.931c0,0,25.6,42.372,52.966,70.621v26.483 c0,44.138,35.31,79.448,79.448,79.448h88.276c34.428,0,69.738-29.131,77.683-62.676c1.766-7.945,5.297-19.421,10.593-25.6 c7.945-8.828,17.655-30.897,17.655-61.793V220.69z"/></svg><div class="spinner-values"></div></div></div><div class="time-unit"><label>Хвилини</label><div class="spinner-container" id="minuteSpinner"><div class="spinner-values"></div></div></div></div><input type="hidden" id="datetime" name="datetime"><button class="submit-btn" onclick="submitDateTime()">Підтвердити</button><div id="error-popup" class="error-popup"></div></div><script src="https://telegram.org/js/telegram-web-app.js"></script><script>// -----------------------------
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Custom Inline Date & Time Picker</title><style>
+:root {
+    --tg-bg-color: #f0f0f0;
+    --tg-text-color: #333;
+    --tg-hint-color: #666;
+    --tg-link-color: #007bff;
+    --tg-button-color: #007bff;
+    --tg-button-text-color: #fff;
+}
+
+body{
+    font-family:Arial,sans-serif;
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+    height:100vh;
+    background-color:var(--tg-bg-color);
+    margin:0;
+    padding-top:0;
+    color:var(--tg-text-color);
+}
+
+.container{
+    background-color:var(--tg-bg-color);
+    padding:0 20px 20px;
+    border-radius:10px;
+    box-shadow:0 0 10px rgba(0,0,0,.1);
+    text-align:center;
+    max-width:400px;
+    width:100%;
+    position:relative
+}
+
+.container h2{
+    margin-bottom:15px;
+    font-size:1.4em;
+    color:var(--tg-text-color);
+}
+
+.calendar-header button{
+    padding:6px 10px;
+    cursor:pointer;
+    border:none;
+    background:var(--tg-button-color);
+    border-radius:20px;
+    color:var(--tg-button-text-color);
+    font-weight:500;
+    font-size:.9em;
+    transition:all .3s ease;
+    box-shadow:0 2px 4px rgba(0,0,0,.1);
+    white-space:nowrap
+}
+
+.calendar-header button:hover:not(:disabled){
+    opacity: 0.8;
+}
+
+.calendar-header button:disabled{
+    opacity: 0.5;
+    cursor:not-allowed;
+    box-shadow:none
+}
+
+#monthYear{
+    color:var(--tg-text-color);
+}
+
+.day-name{
+    color:var(--tg-hint-color);
+}
+
+.time-picker label{
+    color:var(--tg-text-color);
+}
+
+.submit-btn{
+    background-color:var(--tg-button-color);
+    color:var(--tg-button-text-color);
+}
+
+.submit-btn:hover{
+    opacity: 0.8;
+}
+
+.calendar-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;padding:0 5px}.calendar-header button{padding:6px 10px;cursor:pointer;border:none;background:#f8f9fa;border-radius:20px;color:#007bff;font-weight:500;font-size:.9em;transition:all .3s ease;box-shadow:0 2px 4px rgba(0,0,0,.1);white-space:nowrap}.calendar-header button:hover:not(:disabled){background:#007bff;color:#fff}.calendar-header button:disabled{background:#e9ecef;color:#adb5bd;cursor:not-allowed;box-shadow:none}#monthYear{font-weight:700;font-size:1.1em;color:#333;display:flex;flex-direction:column;line-height:1.2}.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-bottom:15px;padding:5px}.day-name{font-weight:700;color:#666;padding:5px;font-size:.9em}.day-cell{padding:8px;background-color:#f8f9fa;border-radius:5px;cursor:pointer;transition:all .2s ease}.day-cell:hover:not(.disabled){background-color:#e3f2fd;transform:scale(1.1)}.disabled{background-color:#e9ecef!important;color:#adb5bd!important;cursor:not-allowed!important;transform:none!important}.selected{background-color:#007bff!important;color:#fff!important;font-weight:700;transform:scale(1.1)}.time-picker{margin-bottom:20px;display:flex;justify-content:center;align-items:center;gap:30px}.time-picker label{color:#495057;font-weight:500;margin-bottom:5px}.spinner-container{display:flex;flex-direction:column;align-items:center;position:relative;height:120px;overflow:hidden;background:#f8f9fa;border-radius:10px;padding:0 15px;min-width:70px;cursor:grab;touch-action:pan-y}.spinner-container.dragging{cursor:grabbing}.spinner-container::after,.spinner-container::before{content:'';position:absolute;left:0;right:0;height:40px;z-index:1;pointer-events:none}.spinner-container::before{top:0;background:linear-gradient(to bottom,rgba(248,249,250,1) 0,rgba(248,249,250,0) 100%)}.spinner-container::after{bottom:0;background:linear-gradient(to top,rgba(248,249,250,1) 0,rgba(248,249,250,0) 100%)}.spinner-values{display:flex;flex-direction:column;align-items:center;transform:translateY(40px);pointer-events:none}.spinner-value{height:40px;line-height:40px;font-size:1.2em;color:#adb5bd;transition:all .2s ease;user-select:none}.spinner-container .spinner-value.selected{color:#616060!important;font-size:1.4em;font-weight:700;background:0 0!important;transform:none!important}.spinner-value.disabled{color:#dee2e6;pointer-events:none}.time-unit{display:flex;flex-direction:column;align-items:center}.submit-btn{padding:12px 25px;border:none;border-radius:25px;background-color:#007bff;color:#fff;font-size:16px;font-weight:500;cursor:pointer;transition:all .3s ease;box-shadow:0 2px 4px rgba(0,0,0,.1)}.submit-btn:hover{background-color:#0056b3;transform:translateY(-1px);box-shadow:0 4px 6px rgba(0,0,0,.1)}.submit-btn:active{transform:translateY(0);box-shadow:0 2px 4px rgba(0,0,0,.1)}.error-popup{background-color:#f8d7da;color:#721c24;padding:12px;border-radius:8px;border:1px solid #f5c6cb;display:none;margin-top:20px;width:calc(100% - 24px);position:absolute;bottom:-70px;left:50%;transform:translateX(-50%);box-shadow:0 2px 4px rgba(0,0,0,.1);font-size:.9em}.onboarding-animation{position:absolute;left:50%;transform:translateX(-50%);top:20px;width:40px;height:40px;z-index:10;animation:scrollAnimation 2s ease-in-out forwards;opacity:0;pointer-events:none}@keyframes scrollAnimation{0%{opacity:0;transform:translate(-50%,0)}20%{opacity:1;transform:translate(-50%,0)}40%{transform:translate(-50%,40px)}60%{transform:translate(-50%,0)}80%{opacity:1;transform:translate(-50%,40px)}100%{opacity:0;transform:translate(-50%,40px)}}</style></head><body><div class="container"><h2>Оберіть дату та час</h2><div class="calendar-header"><button id="prevBtn">← Попередній</button><div id="monthYear"></div><button id="nextBtn">Наступний →</button></div><div class="calendar-grid" id="calendarGrid"></div><div class="time-picker"><div class="time-unit"><label>Години</label><div class="spinner-container" id="hourSpinner"><svg class="onboarding-animation" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path style="fill:#FDC794;" d="M459.09,220.69c0-19.421-15.89-35.31-35.31-35.31c-19.421,0-35.31,15.89-35.31,35.31v-44.138 c0-19.421-15.89-35.31-35.31-35.31c-19.421,0-35.31,15.89-35.31,35.31v-35.31c0-19.421-15.89-35.31-35.31-35.31l0,0 c-19.421,0-35.31,15.89-35.31,35.31v35.31V35.31c0-19.421-15.89-35.31-35.31-35.31l0,0c-19.421,0-35.31,15.89-35.31,35.31v229.517 l-15.89-23.834c-17.655-30.897-60.028-45.021-88.276-34.428c-4.414,0.883-7.062,3.531-10.593,5.297 c-10.593,7.062-8.828,15.007-8.828,17.655s50.317,53.848,79.448,105.931c0,0,25.6,42.372,52.966,70.621v26.483 c0,44.138,35.31,79.448,79.448,79.448h88.276c34.428,0,69.738-29.131,77.683-62.676c1.766-7.945,5.297-19.421,10.593-25.6 c7.945-8.828,17.655-30.897,17.655-61.793V220.69z"/></svg><div class="spinner-values"></div></div></div><div class="time-unit"><label>Хвилини</label><div class="spinner-container" id="minuteSpinner"><div class="spinner-values"></div></div></div></div><input type="hidden" id="datetime" name="datetime"><button class="submit-btn" onclick="submitDateTime()">Підтвердити</button><div id="error-popup" class="error-popup"></div></div><script src="https://telegram.org/js/telegram-web-app.js"></script><script>// -----------------------------
         //       GLOBAL VARIABLES
         // -----------------------------
         const now = new Date();
@@ -66,6 +150,8 @@
         //      DOCUMENT READY
         // -----------------------------
         document.addEventListener('DOMContentLoaded', function() {
+            setTelegramTheme();
+            
             // Initialize current month/year from rounded time
             currentYear = initialTime.year;
             currentMonth = initialTime.month;
@@ -179,42 +265,24 @@
             });
 
             // Touch/Mouse events
-            container.addEventListener('mousedown', (e) => {
-                e.stopPropagation(); // Prevent event from bubbling to document
-                startDragging(e);
-            });
-            
+            container.addEventListener('mousedown', startDragging);
             container.addEventListener('touchstart', (e) => {
-                e.stopPropagation(); // Prevent event from bubbling to document
-                if (e.cancelable) {
-                    e.preventDefault(); // Prevent scrolling only within spinner
-                }
+                e.preventDefault(); // Prevent scrolling
                 startDragging(e.touches[0]);
             }, { passive: false });
 
-            // Handle move events on document to allow dropping outside
             document.addEventListener('mousemove', (e) => {
                 if (isDragging) drag(e);
             });
-            
             document.addEventListener('touchmove', (e) => {
                 if (isDragging) {
-                    if (e.cancelable) {
-                        e.preventDefault(); // Prevent scrolling only when dragging
-                    }
+                    e.preventDefault(); // Prevent scrolling
                     drag(e.touches[0]);
                 }
             }, { passive: false });
 
             document.addEventListener('mouseup', stopDragging);
             document.addEventListener('touchend', stopDragging);
-
-            // Prevent default touch behavior only within spinner
-            container.addEventListener('touchmove', (e) => {
-                if (e.cancelable) {
-                    e.preventDefault();
-                }
-            }, { passive: false });
 
             function startDragging(e) {
                 isDragging = true;
@@ -567,4 +635,18 @@
         // Notify Telegram the WebApp is ready (if present)
         if (window.Telegram && window.Telegram.WebApp) {
         Telegram.WebApp.ready();
+        }
+
+        // Add this at the beginning of your script
+        function setTelegramTheme() {
+            if (window.Telegram && window.Telegram.WebApp) {
+                const tg = window.Telegram.WebApp;
+                
+                document.documentElement.style.setProperty('--tg-bg-color', tg.themeParams.bg_color || '#f0f0f0');
+                document.documentElement.style.setProperty('--tg-text-color', tg.themeParams.text_color || '#333');
+                document.documentElement.style.setProperty('--tg-hint-color', tg.themeParams.hint_color || '#666');
+                document.documentElement.style.setProperty('--tg-link-color', tg.themeParams.link_color || '#007bff');
+                document.documentElement.style.setProperty('--tg-button-color', tg.themeParams.button_color || '#007bff');
+                document.documentElement.style.setProperty('--tg-button-text-color', tg.themeParams.button_text_color || '#fff');
+            }
         }</script></body></html>
